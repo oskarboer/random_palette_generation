@@ -22,7 +22,29 @@ fn generate_random(n: u8) -> Vec<RGB<u8>> {
     ret
 }
 
+fn find_boundries() {
+    let (mut a_min, mut a_max) = (f32::MAX, f32::MIN);
+    let (mut b_min, mut b_max) = (f32::MAX, f32::MIN);
+
+    for r in 0..255 {
+        for g in 0..255 {
+            for b in 0..255 {
+                let color = srgb_to_oklab(RGB {r, g, b});
+
+                a_min = a_min.min(color.a);
+                a_max = a_max.max(color.a);
+                b_min = b_min.min(color.b);
+                b_max = b_max.max(color.b);
+
+            }
+        }
+    }
+    println!("a range:{a_min:.3} - {a_max:.3}, b range: {b_min:.3} - {b_max:.3}");
+}
+
 fn main() {
+
+    find_boundries();
 
     let args: Vec<String> = env::args().collect();
     dbg!(&args);
