@@ -1,22 +1,34 @@
 use oklab::*;
 use std::env;
 use rand::prelude::*;
+use std::fs::write;
+
 
 fn generate_random(n: u8) -> Vec<RGB<u8>> {
+    let (a_min, a_max) = (-0.233, 0.275);
+    let (b_min, b_max) = (-0.311, 0.198);
+
     let mut ret = Vec::new();
 
     let mut rng = rand::thread_rng();
     let l = rng.gen::<f32>();
-    let mut a = rng.gen::<f32>() * 3.0 - 1.5;
-    let mut b = rng.gen::<f32>() * 3.0 - 1.5;
+    let mut a = rng.gen::<f32>() * (a_max - a_min) - a_min;
+    let mut b = rng.gen::<f32>() * (b_max - b_min) - b_min;
 
-    let da = rng.gen::<f32>() / n as f32;
-    let db = rng.gen::<f32>() / n as f32;
+    let mut da = rng.gen::<f32>() / n as f32;
+    let mut db = rng.gen::<f32>() / n as f32;
 
     for _ in 0..n {
         ret.push(oklab_to_srgb(Oklab {l, a, b}));
         a += da;
         b += db;
+
+        if a > a_max || a < a_min {
+            da *= -1.0;
+        }
+        if b > b_max || b < b_min{
+            db *= -1.0;
+        }
     }
 
     ret
@@ -39,13 +51,27 @@ fn find_boundries() {
             }
         }
     }
-    println!("a range:{a_min:.3} - {a_max:.3}, b range: {b_min:.3} - {b_max:.3}");
+    println!("a range: {a_min:.3} - {a_max:.3}, b range: {b_min:.3} - {b_max:.3}");
+}
+
+fn generate_palette_svg(fname: String, colors: Vec<RGB<u8>>) {
+    let head = String::from("<svg version=\"1.1\"\nwidth=\"300\" height=\"200\"\nxmlns=\"http://www.w3.org/2000/svg\">");
+    // let rect_template = String::from("<rect width=\"{:.2}%\" height=\"100%\" fill=\"#{}\" />");
+    let end = String::from("</svg>");
+
+    let fraction = 100.0 / colors.len() as f32;
+    let mut content = vec![];
+    content.push(head);
+    
+    for (i, color) in colors.iter().enumerate() {
+        content.push(format!("<rect x=\"{}%\" width=\"{:.2}%\" height=\"100%\" fill=\"#{}\" />", fraction * i as f32, fraction, format!("{:0>2X}{:0>2X}{:0>2X}", color.r, color.g, color.b)));
+    }
+    content.push(end);
+    
+    write(fname, content.join("\n")).unwrap();
 }
 
 fn main() {
-
-    find_boundries();
-
     let args: Vec<String> = env::args().collect();
     dbg!(&args);
 
@@ -64,8 +90,10 @@ fn main() {
 
     // println!("{:?}", colors);
 
-    for color in colors {
+    for color in colors.iter() {
         print!("#{:0>2X}{:0>2X}{:0>2X} ", color.r, color.g, color.b);
     }
     println!("");
+
+    generate_palette_svg("palette.svg".to_string(), colors);
 }
