@@ -1,11 +1,8 @@
 <svg version="1.1"
 width="300" height="200"
 xmlns="http://www.w3.org/2000/svg">
-<rect x="0%" width="14.29%" height="100%" fill="#C40000" />
-<rect x="14.285714%" width="14.29%" height="100%" fill="#DC0000" />
-<rect x="28.571428%" width="14.29%" height="100%" fill="#C40000" />
-<rect x="42.857143%" width="14.29%" height="100%" fill="#DC0000" />
-<rect x="57.142857%" width="14.29%" height="100%" fill="#C40000" />
-<rect x="71.42857%" width="14.29%" height="100%" fill="#DC0000" />
-<rect x="85.71429%" width="14.29%" height="100%" fill="#C40000" />
+<rect x="0%" width="25.00%" height="100%" fill="#49417F" />
+<rect x="25%" width="25.00%" height="100%" fill="#9564AD" />
+<rect x="50%" width="25.00%" height="100%" fill="#EB8ACA" />
+<rect x="75%" width="25.00%" height="100%" fill="#FFB6D1" />
 </svg>

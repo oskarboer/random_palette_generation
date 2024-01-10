@@ -1,34 +1,46 @@
 use oklab::*;
-use std::env;
+use std::{env, f32::consts::PI};
 use rand::prelude::*;
 use std::fs::write;
 
 
+
+fn oklch_to_oklab(l: f32, c: f32, h: f32) -> Oklab {
+    Oklab {l: l, a: c * h.cos(), b: c * h.sin()}
+}
+
+
+
 fn generate_random(n: u8) -> Vec<RGB<u8>> {
-    let (a_min, a_max) = (-0.233, 0.275);
-    let (b_min, b_max) = (-0.311, 0.198);
+    // let (a_min, a_max) = (-0.233, 0.275);
+    // let (b_min, b_max) = (-0.311, 0.198);
 
     let mut ret = Vec::new();
 
     let mut rng = rand::thread_rng();
-    let l = rng.gen::<f32>();
-    let mut a = rng.gen::<f32>() * (a_max - a_min) - a_min;
-    let mut b = rng.gen::<f32>() * (b_max - b_min) - b_min;
 
-    let mut da = rng.gen::<f32>() / n as f32;
-    let mut db = rng.gen::<f32>() / n as f32;
+    let chroma_base = rng.gen::<f32>() * 0.1 + 0.01;
+    let chroma_contrast = rng.gen::<f32>() * (0.125 - chroma_base - 0.075) + 0.075;
 
-    for _ in 0..n {
-        ret.push(oklab_to_srgb(Oklab {l, a, b}));
-        a += da;
-        b += db;
+    let lightness_base = rng.gen::<f32>() * 0.3 + 0.3;
+    let lightness_contrast = rng.gen::<f32>() * (1.0 - lightness_base - 0.3) + 0.3;
 
-        if a > a_max || a < a_min {
-            da *= -1.0;
-        }
-        if b > b_max || b < b_min{
-            db *= -1.0;
-        }
+    let mut delta;
+    let mut hue_offset;
+    let hue_contrast = rng.gen::<f32>() * 0.7 + 0.3;
+    let hue_base = rng.gen::<f32>() * 2.0 * PI;
+
+    for i in 0..n {
+        delta = i as f32 / (n - 1) as f32 ;
+        hue_offset = delta * hue_contrast * 2.0 * PI + (PI / 4.0);
+        hue_offset *= 0.33;
+
+        let chroma = chroma_base + delta * chroma_contrast;
+        let lightness = lightness_base + delta * lightness_contrast;
+        
+        
+        ret.push(oklab_to_srgb(oklch_to_oklab(lightness, chroma, hue_base + hue_offset)));
+
     }
 
     ret
@@ -53,6 +65,8 @@ fn find_boundries() {
     }
     println!("a range: {a_min:.3} - {a_max:.3}, b range: {b_min:.3} - {b_max:.3}");
 }
+
+
 
 fn generate_palette_svg(fname: String, colors: Vec<RGB<u8>>) {
     let head = String::from("<svg version=\"1.1\"\nwidth=\"300\" height=\"200\"\nxmlns=\"http://www.w3.org/2000/svg\">");
