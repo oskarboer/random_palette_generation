@@ -11,8 +11,8 @@ fn oklch_to_oklab(l: f32, c: f32, h: f32) -> Oklab {
     }
 }
 
-fn put_in_range(num: f32, min: f32, max: f32) -> f32 {
-    num * (max - min) + min
+fn rand_in_range(rand: f32, min: f32, max: f32) -> f32 {
+    rand * (max - min) + min
 }
 
 struct Settings {
@@ -111,13 +111,13 @@ fn main() {
 
     let mut rng = rand::thread_rng();
 
-    let chroma_base = put_in_range(rng.gen::<f32>(), 0.01, 0.1);
-    let chroma_contrast = put_in_range(rng.gen::<f32>(), 0.075, 0.125 - chroma_base);
+    let chroma_base = rand_in_range(rng.gen::<f32>(), 0.01, 0.1);
+    let chroma_contrast = rand_in_range(rng.gen::<f32>(), 0.075, 0.125 - chroma_base);
 
-    let lightness_base = put_in_range(rng.gen::<f32>(), 0.3, 0.6);
-    let lightness_contrast = put_in_range(rng.gen::<f32>(), 0.3, 1.0 - lightness_base);
+    let lightness_base = rand_in_range(rng.gen::<f32>(), 0.3, 0.6);
+    let lightness_contrast = rand_in_range(rng.gen::<f32>(), 0.3, 1.0 - lightness_base);
 
-    let hue_contrast = put_in_range(rng.gen::<f32>(), 0.3, 1.0);
+    let hue_contrast = rand_in_range(rng.gen::<f32>(), 0.3, 1.0);
     let hue_base = rng.gen::<f32>() * 2.0 * PI;
 
     let settings = Settings {
